@@ -28,7 +28,7 @@ namespace IHire.Core
 
             AzureOpenAIClient azureClient = new(
            new Uri("https://learnopenai-ashish036.openai.azure.com/"),
-           new Azure.AzureKeyCredential("e710a8e5a085494eb7c155dfab483f96"));
+           new Azure.AzureKeyCredential("Azure Credential"));
 
 #pragma warning disable OPENAI001 
             var client = azureClient.GetAssistantClient();
