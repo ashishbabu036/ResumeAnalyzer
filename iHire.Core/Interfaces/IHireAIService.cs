@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IHire.Core.Interfaces
+namespace IHire.Core
 {
-    interface IHireAIService
+    public interface IHireAIService
     {
         Task<string> ExtractCandidateInfo(string fileName, string queries);
     }

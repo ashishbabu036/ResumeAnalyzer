@@ -1,4 +1,4 @@
-﻿using IHire.Core.Interfaces;
+﻿using IHire.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 using Azure.AI.OpenAI;
 using OpenAI.Assistants;
 
-namespace IHire.Core.Services
+namespace IHire.Core
 {
-    internal class HireAIService : IHireAIService
+    public class HireAIService : IHireAIService
     {
         public async Task<string> ExtractCandidateInfo(string fileName, string queries)
         {
             string aiResponse = string.Empty;
-            string path = Directory.GetCurrentDirectory() + "\\FileDownloaded";
+            string path = Directory.GetCurrentDirectory() + "\\FileDownloaded\\" + fileName;
 
-            if (!Directory.Exists(path)) return "Resume Not Uploaded";
-
+           
             if (fileName.EndsWith(".pdf"))
             {
                 queries = queries + " using  OCR (Optical Character Recognition)";
@@ -60,7 +59,7 @@ namespace IHire.Core.Services
                 var messageCreationOptions = new MessageCreationOptions();
                 messageCreationOptions.Attachments.Add(new MessageCreationAttachment(fileUploadResponse.Value.Id, new List<ToolDefinition>() { ToolDefinition.CreateCodeInterpreter() }));
 
-                await client.CreateMessageAsync(thread, new List<MessageContent>() { MessageContent.FromText(question) }, messageCreationOptions);
+                await client.CreateMessageAsync(thread, new List<MessageContent>() { MessageContent.FromText(queries) }, messageCreationOptions);
 
                 await foreach (StreamingUpdate streamingUpdate
                         in client.CreateRunStreamingAsync(thread, assistant, new RunCreationOptions()))
