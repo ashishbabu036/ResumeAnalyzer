@@ -9,5 +9,7 @@ namespace IHire.Core
     public interface IHireAIService
     {
         Task<string> ExtractCandidateInfo(string fileName, string queries);
+
+        Task<FileUploadedInfo> UploadFile(Stream fileName);
     }
 }

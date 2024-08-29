@@ -12,7 +12,7 @@ namespace IHire.API.Controllers
         private IHireAIService _hireAIService;
         public HireCandidateController(IHireAIService hireAIService)
         {
-            _hireAIService = hireAIService;  
+            _hireAIService = hireAIService;
         }
 
         [HttpPost("resume")]
@@ -31,6 +31,13 @@ namespace IHire.API.Controllers
 
             string result = await _hireAIService.ExtractCandidateInfo(file.FileName, question);
             return Ok(result);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
+        {
+            await _hireAIService.UploadFile(file.);
+            return Ok();
         }
     }
 }

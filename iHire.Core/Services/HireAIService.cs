@@ -6,9 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI;
 using OpenAI.Assistants;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace IHire.Core
 {
+    public class FileUploadedInfo {
+        private string documentId;
+        public string DocumentId { get => documentId; set => documentId=value; }
+    }
+
+
     public class HireAIService : IHireAIService
     {
         public async Task<string> ExtractCandidateInfo(string fileName, string queries)
@@ -28,7 +36,7 @@ namespace IHire.Core
 
             AzureOpenAIClient azureClient = new(
            new Uri("https://learnopenai-ashish036.openai.azure.com/"),
-           new Azure.AzureKeyCredential("Azure Credential"));
+           new Azure.AzureKeyCredential("e710a8e5a085494eb7c155dfab483f96"));
 
 #pragma warning disable OPENAI001 
             var client = azureClient.GetAssistantClient();
@@ -87,6 +95,38 @@ namespace IHire.Core
             }
             return aiResponse;
 
+        }
+
+        public async Task<FileUploadedInfo> UploadFile(Stream file)
+
+        { 
+            FileUploadedInfo fileUploadedInfo = new FileUploadedInfo();
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization", "api-key {value}");
+
+
+                byte[] data;
+                using (var br = new BinaryReader(file))
+                    data = br.ReadBytes((int)file.Length);
+
+                ByteArrayContent bytes = new ByteArrayContent(data);
+
+
+                MultipartFormDataContent multiContent = new MultipartFormDataContent();
+
+                multiContent.Add(bytes, "file", "TestResume");
+
+                using (var response = await httpClient.PostAsync("<Talk2docs URL>", multiContent))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    if (apiResponse != null)
+                    {
+                        fileUploadedInfo = JsonConvert.DeserializeObject<FileUploadedInfo>(apiResponse);
+                    }
+                }
+            }
+            return fileUploadedInfo;
         }
     }
 }
