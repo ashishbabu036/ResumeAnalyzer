@@ -13,5 +13,8 @@ namespace IHire.Core
         Task<FileUploadedInfo> UploadFile(Stream fileName);
 
         Task<string> FetchContentFromResume(string documentId);
+
+        Task<string> FetchSkills(Chat[] messages);
+
     }
 }

@@ -46,5 +46,12 @@ namespace IHire.API.Controllers
             string textContent = await _hireAIService.FetchContentFromResume(documentId);
             return Ok(textContent);
         }
+
+        [HttpPost("skills")]
+        public async Task<IActionResult> FetchSkills([FromBody] Chat[] messages)
+        {
+            string textContent = await _hireAIService.FetchSkills(messages);
+            return Ok(textContent);
+        }
     }
 }

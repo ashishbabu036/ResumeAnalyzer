@@ -9,6 +9,7 @@ using OpenAI.Assistants;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Reflection.Metadata;
 
 namespace IHire.Core
 {
@@ -21,6 +22,11 @@ namespace IHire.Core
     {
         public Chat[] QueryMessages;
         public Chat[] AnswerMessages;
+    }
+
+    public class OpenAIResponse
+    {
+        public Chat Result;
     }
 
     public class Chat
@@ -115,7 +121,7 @@ namespace IHire.Core
 
         public async Task<string> FetchContentFromResume(string documentId)
         {
-            string content = string.Empty;
+   
             Talk2DocsResponse talk2DocsResponse = null;
             using (var httpClient = new HttpClient())
             {
@@ -136,6 +142,26 @@ namespace IHire.Core
             }
 
             return talk2DocsResponse.AnswerMessages[0].Content;
+        }
+
+        public async Task<string> FetchSkills(Chat[] messages)
+        {
+            OpenAIResponse openAIResponse = null;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization", "api-key {value}");
+                var requestBody = new StringContent(JsonConvert.SerializeObject(messages));
+                using (var response = await httpClient.PostAsync("<Open AI URL>", requestBody))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    if (apiResponse != null)
+                    {
+                        openAIResponse = JsonConvert.DeserializeObject<OpenAIResponse>(apiResponse);
+                    }
+                }
+            }
+
+            return openAIResponse.Result.Content;
         }
 
         public async Task<FileUploadedInfo> UploadFile(Stream file)
