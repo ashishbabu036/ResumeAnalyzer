@@ -11,5 +11,7 @@ namespace IHire.Core
         Task<string> ExtractCandidateInfo(string fileName, string queries);
 
         Task<FileUploadedInfo> UploadFile(Stream fileName);
+
+        Task<string> FetchContentFromResume(string documentId);
     }
 }

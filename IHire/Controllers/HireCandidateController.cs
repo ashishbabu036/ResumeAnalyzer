@@ -36,8 +36,15 @@ namespace IHire.API.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
-            await _hireAIService.UploadFile(file.);
-            return Ok();
+            var response = await _hireAIService.UploadFile(file.OpenReadStream());
+            return Ok(response.DocumentId);
+        }
+
+        [HttpPost("extract")]
+        public async Task<IActionResult> ExtractContent([FromBody] string documentId)
+        {
+            string textContent = await _hireAIService.FetchContentFromResume(documentId);
+            return Ok(textContent);
         }
     }
 }

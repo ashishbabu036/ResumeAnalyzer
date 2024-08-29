@@ -8,12 +8,28 @@ using Azure.AI.OpenAI;
 using OpenAI.Assistants;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 
 namespace IHire.Core
 {
     public class FileUploadedInfo {
         private string documentId;
         public string DocumentId { get => documentId; set => documentId=value; }
+    }
+
+    public class Talk2DocsResponse
+    {
+        public Chat[] QueryMessages;
+        public Chat[] AnswerMessages;
+    }
+
+    public class Chat
+    {
+        private string role;
+        private string content;
+
+        public string Role { get => role; set => role = value; }
+        public string Content { get => content; set => content=value; }
     }
 
 
@@ -95,6 +111,31 @@ namespace IHire.Core
             }
             return aiResponse;
 
+        }
+
+        public async Task<string> FetchContentFromResume(string documentId)
+        {
+            string content = string.Empty;
+            Talk2DocsResponse talk2DocsResponse = null;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization", "api-key {value}");
+
+                Chat history = new Chat();
+                history.Role = "user";
+                history.Content = $"Extract Technical Skill Sets in Comma Separated from document with document id :{documentId}";
+                var requestBody = new StringContent(JsonConvert.SerializeObject(history));
+                using (var response = await httpClient.PostAsync("<Talk2docs URL>", requestBody))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    if (apiResponse != null)
+                    {
+                        talk2DocsResponse = JsonConvert.DeserializeObject<Talk2DocsResponse>(apiResponse);
+                    }
+                }
+            }
+
+            return talk2DocsResponse.AnswerMessages[0].Content;
         }
 
         public async Task<FileUploadedInfo> UploadFile(Stream file)
